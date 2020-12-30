@@ -2240,7 +2240,8 @@ class LimitedAggregateSearchSerializer(HaystackSerializer):
             'uuid',
             'key',
             'aggregation_key',
-            'content_type'
+            'content_type',
+            'topics'
         ]
         index_classes = [
             search_indexes.CourseRunIndex,
