@@ -325,6 +325,7 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
     authoring_organizations_autocomplete = indexes.NgramField(boost=ORG_FIELD_BOOST)
     authoring_organization_uuids = indexes.MultiValueField()
     subject_uuids = indexes.MultiValueField()
+    topics = indexes.MultiValueField()
     staff_uuids = indexes.MultiValueField()
     authoring_organization_bodies = indexes.MultiValueField()
     credit_backing_organizations = indexes.MultiValueField(faceted=True)
@@ -355,6 +356,9 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
 
     def prepare_subject_uuids(self, obj):
         return [str(subject.uuid) for subject in obj.subjects]
+
+    def prepare_topics(self, obj):
+        return [topic.name for topic in obj.topics]
 
     def prepare_staff_uuids(self, obj):
         return {str(staff.uuid) for course_run in obj.course_runs for staff in course_run.staff.all()}
