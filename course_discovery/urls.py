@@ -47,6 +47,7 @@ urlpatterns = oauth2_urlpatterns + [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', JavaScriptCatalog, name='javascript-catalog'),
     url(r'^taggit_autosuggest/', include('taggit_autosuggest.urls')),
+    url(r'^course_update_scripts/', include('course_update_scripts.urls')),
 ]
 
 # edx-drf-extensions csrf app

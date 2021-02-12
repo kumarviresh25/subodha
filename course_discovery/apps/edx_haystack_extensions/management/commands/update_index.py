@@ -67,6 +67,8 @@ class Command(HaystackCommand):
 
         if indexes_pending:
             raise CommandError('Sanity check failed for new index(es): {}'.format(indexes_pending))
+        else:
+            return "Indexing Run SuccessFully"
 
     def percentage_change(self, current, previous):
         try:

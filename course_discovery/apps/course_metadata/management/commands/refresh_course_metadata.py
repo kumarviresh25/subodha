@@ -171,3 +171,5 @@ class Command(BaseCommand):
 
         if not success:
             raise CommandError('One or more of the data loaders above failed.')
+        else:
+            return "Command Run SuccessFully"
