@@ -8,7 +8,7 @@ def update_scripts(request):
     return render(request, 'update_scripts.html',{})
 
 def discovery_views(request):
-    course_meta = call_command('refresh_course_metadata')
+    course_meta = call_command('refresh_course_metadata', verbosity=0)
     # import pdb; pdb.set_trace()
     return HttpResponse(course_meta)
 
