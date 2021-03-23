@@ -145,7 +145,7 @@ class Command(BaseCommand):
                                     is_threadsafe,
                                 ))
 
-                #success = success and all(f.result() for f in futures)
+                success = success and all(f.result() for f in futures)
             else:
                 # Flatten pipeline and run serially.
                 for loader_class, api_url, max_workers in itertools.chain(*(stage for stage in pipeline)):
