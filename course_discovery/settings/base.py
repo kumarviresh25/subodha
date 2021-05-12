@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'course_update_scripts',
 ]
 
 THIRD_PARTY_APPS = [
