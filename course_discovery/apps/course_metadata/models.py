@@ -2067,6 +2067,11 @@ class Program(PkSearchableMixin, TimeStampedModel):
         blank=True, default=0, help_text=_(
             'Number of credits a learner will earn upon successful completion of the program')
     )
+    program_topics = TaggableManager(
+        blank=True,
+        help_text=_('Pick a tag from the suggestions. To make a new tag, add a comma after the tag name.'),
+        related_name='program_topics',
+    )
     objects = ProgramQuerySet.as_manager()
 
     history = HistoricalRecords()
