@@ -2072,6 +2072,7 @@ class Program(PkSearchableMixin, TimeStampedModel):
         help_text=_('Pick a tag from the suggestions. To make a new tag, add a comma after the tag name.'),
         related_name='program_topics',
     )
+    program_subjects = SortedManyToManyField(Subject, blank=True)
     objects = ProgramQuerySet.as_manager()
 
     history = HistoricalRecords()
