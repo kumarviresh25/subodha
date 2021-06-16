@@ -327,6 +327,7 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
     subject_uuids = indexes.MultiValueField()
     topics = indexes.MultiValueField()
     program_topics= indexes.MultiValueField()
+    program_subjects = indexes.MultiValueField()
     staff_uuids = indexes.MultiValueField()
     authoring_organization_bodies = indexes.MultiValueField()
     credit_backing_organizations = indexes.MultiValueField(faceted=True)
@@ -351,6 +352,9 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
 
     def prepare_program_topics(self, obj):
         return [ptopic.name for ptopic in obj.program_topics.all()]
+
+    def prepare_program_subjects(self, obj):
+        return [psubjects.name for psubjects in obj.program_subjects.all()]
 
     def prepare_published(self, obj):
         return obj.status == ProgramStatus.Active

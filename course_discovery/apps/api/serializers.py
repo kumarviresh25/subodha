@@ -2198,6 +2198,7 @@ class ProgramSearchSerializer(HaystackSerializer):
             'search_card_display',
             'topics',
             'program_topics',
+            'program_subjects',
         )
 
 
