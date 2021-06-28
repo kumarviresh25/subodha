@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'course_update_scripts',
+    'extandedapi',
 ]
 
 THIRD_PARTY_APPS = [
@@ -388,6 +389,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'course_discovery.apps.api.pagination.PageNumberPagination',
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.DjangoModelPermissions',
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'PAGE_SIZE': 20,
     'TEST_REQUEST_RENDERER_CLASSES': (

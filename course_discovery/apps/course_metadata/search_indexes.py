@@ -325,7 +325,7 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
     authoring_organizations_autocomplete = indexes.NgramField(boost=ORG_FIELD_BOOST)
     authoring_organization_uuids = indexes.MultiValueField()
     subject_uuids = indexes.MultiValueField()
-    topics = indexes.MultiValueField()
+    # topics = indexes.MultiValueField()
     program_topics= indexes.MultiValueField()
     program_subjects = indexes.MultiValueField()
     staff_uuids = indexes.MultiValueField()
@@ -365,8 +365,8 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
     def prepare_subject_uuids(self, obj):
         return [str(subject.uuid) for subject in obj.subjects]
 
-    def prepare_topics(self, obj):
-        return [topic.name for topic in obj.topics]
+    # def prepare_topics(self, obj):
+    #     return [topic.name for topic in obj.topics]
 
     def prepare_staff_uuids(self, obj):
         return {str(staff.uuid) for course_run in obj.course_runs for staff in course_run.staff.all()}
