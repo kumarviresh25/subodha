@@ -326,7 +326,7 @@ class ProgramIndex(BaseIndex, indexes.Indexable, OrganizationsMixin):
     authoring_organization_uuids = indexes.MultiValueField()
     subject_uuids = indexes.MultiValueField()
     # topics = indexes.MultiValueField()
-    program_topics= indexes.MultiValueField()
+    program_topics= indexes.MultiValueField(faceted=True)
     program_subjects = indexes.MultiValueField()
     staff_uuids = indexes.MultiValueField()
     authoring_organization_bodies = indexes.MultiValueField()

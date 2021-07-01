@@ -29,7 +29,7 @@ class GetProgramTopics(APIView):
                     }
                 },
             "facets" : {
-                "tags" : { "terms" : {"field" : "program_topics"} }
+                "tags" : { "terms" : {"field" : "program_topics_exact"} }
                 }
             }
         alias = settings.HAYSTACK_CONNECTIONS['default']['INDEX_NAME']
