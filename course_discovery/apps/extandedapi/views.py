@@ -39,6 +39,5 @@ class GetProgramTopics(APIView):
         connection = Elasticsearch(host)
         index_value = connection.indices.get_alias(name=alias)
         es_response = connection.search(index=[i for i in index_value.keys()][0], body=body)
-        # import pdb; pdb.set_trace()
         #es_response['facets']['tags']['terms']   status=status.HTTP_200_OK
         return Response(es_response['facets']['tags'])

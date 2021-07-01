@@ -99,6 +99,10 @@ class ConfigurableElasticBackend(ElasticsearchSearchBackend):
             mapping['aggregation_key']['index'] = 'not_analyzed'
             del mapping['aggregation_key']['analyzer']
 
+        if mapping.get('program_topics'):
+            mapping['program_topics']['index'] = 'not_analyzed'
+            del mapping['program_topics']['analyzer']
+
         # Fields default to snowball analyzer, this keeps snowball functionality, but adds synonym functionality
         snowball_with_synonyms = 'snowball_with_synonyms'
         for field, value in mapping.items():
