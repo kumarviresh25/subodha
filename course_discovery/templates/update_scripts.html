@@ -1,7 +1,32 @@
 <h1>hello discovery</h1>
 
 
+{% if course_meta_command_state %}
+<style>
+a.disabled_course_sync {
+    pointer-events: none;
+    color: #ccc;
+}   
+</style>
+{% endif %}
 
-<a href="{% url 'course_sync' %}">course-sync</a>
+{% if update_index_command_state %}
+<style>
+a.disabled_update_index {
+    pointer-events: none;
+    color: #ccc;
+}   
+</style>
+{% endif %}
 
-<a href="{% url 'update_indexCmd' %}">update-index</a>
+   <div> 
+        <a href="{% url 'course_sync' %}" class="disabled_course_sync">course-sync</a> 
+        <span> last Running Time {{ course_meta_timestamp }}</span>
+    </div>
+
+   <div> 
+        <a href="{% url 'update_indexCmd' %}" class="disabled_update_index">update-index</a> 
+        <span> last Running Time {{ course_meta_timestamp }} </span> 
+    </div>
+
+

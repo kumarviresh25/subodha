@@ -1,6 +1,9 @@
 import concurrent.futures
 import itertools
 import logging
+from django.core.cache import cache
+from datetime import datetime
+
 
 import waffle
 from django.apps import apps
@@ -62,6 +65,10 @@ class Command(BaseCommand):
         # completes. Disconnecting the api_change_receiver function from post_save
         # and post_delete signals prevents model changes during data loading from
         # repeatedly invalidating the cache.
+        
+        cache.set('course_meta_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
+        cache.set('course_meta_status', True)
+
         for model in apps.get_app_config('course_metadata').get_models():
             for signal in (post_save, post_delete):
                 signal.disconnect(receiver=api_change_receiver, sender=model)
@@ -168,8 +175,6 @@ class Command(BaseCommand):
         delete_orphans(Video)
 
         set_api_timestamp()
-
+        cache.set('course_meta_status', False)
         if not success:
             raise CommandError('One or more of the data loaders above failed.')
-        else:
-            return "Command Run SuccessFully"

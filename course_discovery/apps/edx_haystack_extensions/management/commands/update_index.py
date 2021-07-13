@@ -1,6 +1,7 @@
 import logging
 import time
-
+from django.core.cache import cache
+from datetime import datetime
 from django.conf import settings
 from django.core.management import CommandError
 from haystack import connections as haystack_connections
@@ -27,6 +28,9 @@ class Command(HaystackCommand):
     def handle(self, **options):
         from django.utils import translation
         translation.activate(settings.LANGUAGE_CODE)
+        
+        cache.set('update_index_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
+        cache.set('update_index_status', True)
 
         self.backends = options.get('using')
         if not self.backends:
@@ -68,6 +72,7 @@ class Command(HaystackCommand):
         if indexes_pending:
             raise CommandError('Sanity check failed for new index(es): {}'.format(indexes_pending))
         else:
+            cache.set('update_index_status', False)
             return "Indexing Run SuccessFully"
 
     def percentage_change(self, current, previous):
