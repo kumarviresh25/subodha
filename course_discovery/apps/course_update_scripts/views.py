@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from time import time
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.core.management import call_command
 from django.core.cache import cache
+from threading import Thread
+import time
 
 
 
@@ -38,17 +41,19 @@ def update_scripts(request):
         }
     return render(request, 'update_scripts.html',context)
 
-def discovery_views(request):
+def callcourse_sync():
     call_command('refresh_course_metadata', verbosity=0)
-    if cache.get('course_meta_status'):
-        return HttpResponse("Running State..........")
-    else:
-        return HttpResponse("Run SuccessFully")
+
+def callupdate_index():
+    call_command('update_index', '--disable-change-limit')
+
+def discovery_views(request):
+    Thread(target=callcourse_sync).start()
+    time.sleep(2)
+    return redirect(update_scripts)
 
 def update_indexCmd(request):
-    call_command('update_index', '--disable-change-limit')
-    if cache.get('update_index_status'):
-        return HttpResponse("Running State...........")
-    else:
-        return HttpResponse("Run SuccessFully")
-    
+    Thread(target=callupdate_index).start()
+    time.sleep(2)
+    return redirect(update_scripts)
+   
