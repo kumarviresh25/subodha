@@ -2,7 +2,7 @@ import logging
 import time
 from django.core.cache import cache
 from datetime import datetime
-import time
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management import CommandError
 from haystack import connections as haystack_connections
@@ -39,7 +39,9 @@ class Command(HaystackCommand):
         It stores the status of the command is in run state or still state.
         When command is in running state the value sets to True else False.
         '''
-        timestamp = time.time() # current utc timestamp
+        curr_datetime_utc = datetime.now()
+        delta = relativedelta(hours=5,minutes=30)
+        ist_time = curr_datetime_utc + delta
         file_dir_curr = os.path.dirname(__file__)   # current dir path
         file_dir = '/'.join(file_dir_curr.split('/')[:6])   # json file dir path
         filepath = os.path.join(file_dir,'command_status.json') # file path
@@ -47,7 +49,7 @@ class Command(HaystackCommand):
             data = json.load(jsonFile)
             # overwirte the value for last run time and status of the command.
             data['update_index_status'] = True
-            data['update_index_timestamp'] = datetime.utcfromtimestamp(int(timestamp)).strftime('%a, %d %b %Y %H:%M:%S') + ' GMT'
+            data['update_index_timestamp'] = ist_time.strftime('%a, %d %b %Y %H:%M:%S') + ' IST'  #ist_time
             jsonFile.seek(0)  # rewind
             json.dump(data, jsonFile)
             jsonFile.truncate()

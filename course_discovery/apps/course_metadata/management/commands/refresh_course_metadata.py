@@ -3,7 +3,7 @@ import itertools
 import logging
 from django.core.cache import cache
 from datetime import datetime
-import time
+from dateutil.relativedelta import relativedelta
 
 
 import waffle
@@ -76,7 +76,9 @@ class Command(BaseCommand):
         It stores the status of the command is in run state or still state.
         When command is in running state the value sets to True else False
         '''
-        timestamp = time.time() # current utc timestamp
+        curr_datetime_utc = datetime.now()
+        delta = relativedelta(hours=5,minutes=30)
+        ist_time = curr_datetime_utc + delta
         file_dir_curr = os.path.dirname(__file__)   # current dir path
         file_dir = '/'.join(file_dir_curr.split('/')[:6])   # json file dir path
         filepath = os.path.join(file_dir,'command_status.json') # file path
@@ -84,7 +86,7 @@ class Command(BaseCommand):
             data = json.load(jsonFile)
             # overwirte the value for last run time and status of the command.
             data['course_meta_status'] = True
-            data['course_meta_timestamp'] = datetime.utcfromtimestamp(int(timestamp)).strftime('%a, %d %b %Y %H:%M:%S') + ' GMT'
+            data['course_meta_timestamp'] = ist_time.strftime('%a, %d %b %Y %H:%M:%S') + ' IST'  #ist_time
             jsonFile.seek(0)  # rewind
             json.dump(data, jsonFile)
             jsonFile.truncate()
