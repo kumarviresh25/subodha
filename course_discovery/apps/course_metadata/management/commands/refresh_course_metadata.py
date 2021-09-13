@@ -3,6 +3,7 @@ import itertools
 import logging
 from django.core.cache import cache
 from datetime import datetime
+import time
 
 
 import waffle
@@ -19,6 +20,7 @@ from course_discovery.apps.course_metadata.data_loaders.api import (
     CoursesApiDataLoader, EcommerceApiDataLoader, ProgramsApiDataLoader
 )
 from course_discovery.apps.course_metadata.models import Course, DataLoaderConfig, Image, Video
+import os, json
 
 logger = logging.getLogger(__name__)
 
@@ -65,9 +67,27 @@ class Command(BaseCommand):
         # completes. Disconnecting the api_change_receiver function from post_save
         # and post_delete signals prevents model changes during data loading from
         # repeatedly invalidating the cache.
-        
-        cache.set('course_meta_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
-        cache.set('course_meta_status', True)
+
+        # cache.set('course_meta_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
+        # cache.set('course_meta_status', True)
+
+        '''
+        Below code is to update the command_status.json:
+        It stores the status of the command is in run state or still state.
+        When command is in running state the value sets to True else False
+        '''
+        timestamp = time.time() # current utc timestamp
+        file_dir_curr = os.path.dirname(__file__)   # current dir path
+        file_dir = '/'.join(file_dir_curr.split('/')[:6])   # json file dir path
+        filepath = os.path.join(file_dir,'command_status.json') # file path
+        with open(filepath, "r+") as jsonFile:
+            data = json.load(jsonFile)
+            # overwirte the value for last run time and status of the command.
+            data['course_meta_status'] = True
+            data['course_meta_timestamp'] = datetime.utcfromtimestamp(int(timestamp)).strftime('%a, %d %b %Y %H:%M:%S') + ' GMT'
+            jsonFile.seek(0)  # rewind
+            json.dump(data, jsonFile)
+            jsonFile.truncate()
 
         for model in apps.get_app_config('course_metadata').get_models():
             for signal in (post_save, post_delete):
@@ -75,7 +95,6 @@ class Command(BaseCommand):
 
         # For each partner defined...
         partners = Partner.objects.all()
-
         # If a specific partner was indicated, filter down the set
         partner_code = options.get('partner_code')
         if partner_code:
@@ -86,7 +105,6 @@ class Command(BaseCommand):
 
         success = True
         for partner in partners:
-
             # The Linux kernel implements copy-on-write when fork() is called to create a new
             # process. Pages that the parent and child processes share, such as the database
             # connection, are marked read-only. If a write is performed on a read-only page
@@ -176,5 +194,13 @@ class Command(BaseCommand):
 
         set_api_timestamp()
         cache.set('course_meta_status', False)
+        with open(filepath, "r+") as jsonFile:
+            data = json.load(jsonFile)
+            # overwirte the value for last run time and status of the command.
+            data['course_meta_status'] = False
+            jsonFile.seek(0)  # rewind
+            json.dump(data, jsonFile)
+            jsonFile.truncate()
+
         if not success:
             raise CommandError('One or more of the data loaders above failed.')

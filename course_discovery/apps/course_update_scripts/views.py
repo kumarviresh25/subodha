@@ -5,16 +5,28 @@ from django.core.management import call_command
 from django.core.cache import cache
 from threading import Thread
 import time
+import os
+import json
 
 
 
 
 def update_scripts(request):
     # import pdb; pdb.set_trace()
-    course_meta_status = cache.get('course_meta_status')
-    course_meta_timestamp = cache.get('course_meta_timestamp')
-    update_index_timestamp = cache.get('update_index_timestamp')
-    update_index_status = cache.get('update_index_status')
+    # course_meta_status = cache.get('course_meta_status')
+    # course_meta_timestamp = cache.get('course_meta_timestamp')
+    # update_index_timestamp = cache.get('update_index_timestamp')
+    # update_index_status = cache.get('update_index_status')
+
+    file_dir_curr = os.path.dirname(__file__)   # current dir path
+    file_dir = '/'.join(file_dir_curr.split('/')[:6])   # json file dir path
+    filepath = os.path.join(file_dir,'command_status.json') # file path
+    with open(filepath, "r") as jsonFile:
+        data = json.load(jsonFile)
+        course_meta_status = data['course_meta_status']
+        course_meta_timestamp = data['course_meta_timestamp']
+        update_index_timestamp = data['update_index_timestamp']
+        update_index_status = data['update_index_status']
 
 
     if update_index_status is not None:

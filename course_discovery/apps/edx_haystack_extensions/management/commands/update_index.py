@@ -2,10 +2,12 @@ import logging
 import time
 from django.core.cache import cache
 from datetime import datetime
+import time
 from django.conf import settings
 from django.core.management import CommandError
 from haystack import connections as haystack_connections
 from haystack.management.commands.update_index import Command as HaystackCommand
+import os,json
 
 from course_discovery.apps.core.utils import ElasticsearchUtils
 
@@ -29,8 +31,26 @@ class Command(HaystackCommand):
         from django.utils import translation
         translation.activate(settings.LANGUAGE_CODE)
         
-        cache.set('update_index_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
-        cache.set('update_index_status', True)
+        # cache.set('update_index_timestamp', datetime.today().strftime('%Y-%m-%d-%H:%M:%S'))
+        # cache.set('update_index_status', True)
+
+        '''
+        Below code is to update the command_status.json:
+        It stores the status of the command is in run state or still state.
+        When command is in running state the value sets to True else False.
+        '''
+        timestamp = time.time() # current utc timestamp
+        file_dir_curr = os.path.dirname(__file__)   # current dir path
+        file_dir = '/'.join(file_dir_curr.split('/')[:6])   # json file dir path
+        filepath = os.path.join(file_dir,'command_status.json') # file path
+        with open(filepath, "r+") as jsonFile:
+            data = json.load(jsonFile)
+            # overwirte the value for last run time and status of the command.
+            data['update_index_status'] = True
+            data['update_index_timestamp'] = datetime.utcfromtimestamp(int(timestamp)).strftime('%a, %d %b %Y %H:%M:%S') + ' GMT'
+            jsonFile.seek(0)  # rewind
+            json.dump(data, jsonFile)
+            jsonFile.truncate()
 
         self.backends = options.get('using')
         if not self.backends:
@@ -73,6 +93,13 @@ class Command(HaystackCommand):
             raise CommandError('Sanity check failed for new index(es): {}'.format(indexes_pending))
         else:
             cache.set('update_index_status', False)
+            with open(filepath, "r+") as jsonFile:
+                data = json.load(jsonFile)
+                # overwirte the value for last run time and status of the command.
+                data['update_index_status'] = False
+                jsonFile.seek(0)  # rewind
+                json.dump(data, jsonFile)
+                jsonFile.truncate()
             return "Indexing Run SuccessFully"
 
     def percentage_change(self, current, previous):
