@@ -1,7 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework.permissions import IsAuthenticated
 from course_discovery.apps.api import filters, serializers
 from course_discovery.apps.api.pagination import ProxiedPagination
 
@@ -14,8 +13,7 @@ class SubjectViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = filters.SubjectFilter
     lookup_field = 'uuid'
     lookup_value_regex = '[0-9a-f-]+'
-    permission_classes = (AllowAny,)
-    authentication_classes = []
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.SubjectSerializer
 
     # Explicitly support PageNumberPagination and LimitOffsetPagination. Future
