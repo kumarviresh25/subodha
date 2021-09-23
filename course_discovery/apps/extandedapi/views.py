@@ -2,16 +2,14 @@ from rest_framework.response import Response
 from django.conf import settings
 from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from haystack import connections as haystack_connections
 from course_discovery.apps.course_metadata.models import Program
-
 
 # pylint: disable=attribute-defined-outside-init
 class GetProgramTopics(APIView):
     """ GET Program Based Topics View."""
-    permission_classes = (AllowAny,)
-    authentication_classes = []
+    permission_classes = (IsAuthenticated,)
     
     def get(self, request):
         sub_name = request.GET.get('subject_name')
