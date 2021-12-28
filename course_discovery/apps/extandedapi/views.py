@@ -3,8 +3,10 @@ from django.conf import settings
 from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from haystack import connections as haystack_connections
-from course_discovery.apps.course_metadata.models import Program
+from course_discovery.apps.course_metadata.models import Program, Course
+from course_discovery.apps.api.v1.views.search import CourseSearchViewSet
+from rest_framework import status
+from collections import OrderedDict
 
 # pylint: disable=attribute-defined-outside-init
 class GetProgramTopics(APIView):
@@ -40,3 +42,51 @@ class GetProgramTopics(APIView):
         es_response = connection.search(index=[i for i in index_value.keys()][0], body=body)
         #es_response['facets']['tags']['terms']   status=status.HTTP_200_OK
         return Response(es_response['facets']['tags'])
+
+class CustomSearch(APIView):
+    """
+    Custom search based on the courses.
+
+    1. Query parameter (q).
+
+    2. Internal course_search api called to get the data.
+
+    3. After getting result appending program_details to the dict and returning in the following format.
+
+        final_response = {
+                "count" : total count of the dict,
+                "next" : next url,
+                "previous" : previous url,
+                "results" : dict type result
+            }
+    """
+    permission_classes = (IsAuthenticated,)
+    def get_program_details(self,course_key):
+        programs_list = list()
+        try:
+            course = Course.objects.get(key=course_key)
+            programs = Program.objects.filter(courses=course)
+            if programs:
+                for program in programs:
+                    programs_list.append({
+                        'title':program.title,
+                        'tags':[tags.name for tags in program.program_topics.all()]
+                    })
+            return programs_list
+        except Course.DoesNotExist:
+            programs_list = None
+            return programs_list
+
+    def get(self,request):
+        programs_details = None
+        content = CourseSearchViewSet.as_view({'get': 'list'})(request._request)
+        for x in content.data['results']:
+            programs_details = self.get_program_details(x['key'])
+            x['program_details'] = programs_details
+        final_response = OrderedDict()
+        final_response["count"] = len(content.data['results'])
+        final_response["next"] = content.data['next'] if content.data['next'] else None
+        final_response["previous"] = content.data['previous'] if content.data['previous'] else None
+        final_response["results"] = content.data['results']
+        return Response(final_response,status=status.HTTP_200_OK)      
+    
