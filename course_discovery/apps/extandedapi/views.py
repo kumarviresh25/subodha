@@ -62,20 +62,23 @@ class CustomSearch(APIView):
     """
     permission_classes = (IsAuthenticated,)
     def get_program_details(self,course_key):
-        programs_list = list()
+        programs_dict = OrderedDict()
         try:
             course = Course.objects.get(key=course_key)
             programs = Program.objects.filter(courses=course)
             if programs:
+                programs_dict['programs'] = [program.title for program in programs]
+                programs_dict['program_id'] = [program.uuid for program in programs]
                 for program in programs:
-                    programs_list.append({
-                        'title':program.title,
-                        'tags':[tags.name for tags in program.program_topics.all()]
+                    programs_dict['tags'] = OrderedDict({
+                        "program_name":program.title,
+                        "program_id":program.uuid,
+                        "tags":[tags.name for tags in program.program_topics.all()]
                     })
-            return programs_list
+            return programs_dict
         except Course.DoesNotExist:
-            programs_list = None
-            return programs_list
+            programs_dict = None
+            return programs_dict
 
     def get(self,request):
         programs_details = None
