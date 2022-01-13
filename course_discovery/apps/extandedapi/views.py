@@ -69,12 +69,12 @@ class CustomSearch(APIView):
             if programs:
                 programs_dict['programs'] = [program.title for program in programs]
                 programs_dict['program_id'] = [program.uuid for program in programs]
-                for program in programs:
-                    programs_dict['tags'] = OrderedDict({
-                        "program_name":program.title,
-                        "program_id":program.uuid,
-                        "tags":[tags.name for tags in program.program_topics.all()]
-                    })
+                # for program in programs:
+                programs_dict['tags'] = [OrderedDict({
+                    "program_name":program.title,
+                    "program_id":program.uuid,
+                    "tags":[tags.name for tags in program.program_topics.all()] })for program in programs]
+                
             return programs_dict
         except Course.DoesNotExist:
             programs_dict = None
