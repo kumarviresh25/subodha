@@ -92,4 +92,24 @@ class CustomSearch(APIView):
         final_response["previous"] = content.data['previous'] if content.data['previous'] else None
         final_response["results"] = content.data['results']
         return Response(final_response,status=status.HTTP_200_OK)      
-    
+
+
+class GetProgramTags(APIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self,request):
+        prog_uuids = request.GET.get('uuids')
+        tags = list()
+        if prog_uuids:
+            for prog_id in prog_uuids.split(','):
+                try:
+                    program = Program.objects.get(uuid=prog_id)
+                    response = {
+                        "program_uuid":prog_id,
+                        "tags":[tags.name for tags in program.program_topics.all()]
+                    }
+                    tags.append(response)
+                except Program.DoesNotExist:
+                    print("Program not found with uuid: %s",prog_id)
+                except Exception as e:
+                   print("Error occured due to: %s",e)
+        return Response(tags,status=status.HTTP_200_OK)
