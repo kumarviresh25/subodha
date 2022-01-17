@@ -105,6 +105,7 @@ class GetProgramTags(APIView):
                     program = Program.objects.get(uuid=prog_id)
                     response = {
                         "program_uuid":prog_id,
+                        "program_title":program.title,
                         "tags":[tags.name for tags in program.program_topics.all()]
                     }
                     tags.append(response)
