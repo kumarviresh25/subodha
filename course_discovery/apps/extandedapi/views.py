@@ -2,11 +2,12 @@ from rest_framework.response import Response
 from django.conf import settings
 from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from course_discovery.apps.course_metadata.models import Program, Course
 from course_discovery.apps.api.v1.views.search import CourseSearchViewSet
 from rest_framework import status
 from collections import OrderedDict
+from itertools import chain
 
 # pylint: disable=attribute-defined-outside-init
 class GetProgramTopics(APIView):
@@ -93,7 +94,6 @@ class CustomSearch(APIView):
         final_response["results"] = content.data['results']
         return Response(final_response,status=status.HTTP_200_OK)      
 
-
 class GetProgramTags(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self,request):
@@ -113,3 +113,12 @@ class GetProgramTags(APIView):
                 except Exception as e:
                    print("Error occured due to: %s",e)
         return Response(tags,status=status.HTTP_200_OK)
+
+class GetAllPrograms(APIView):
+    permission_classes = (AllowAny,)
+    def get(self,request):
+        programs = Program.objects.all()
+        result = dict()
+        for program in programs:
+            result[str(program.uuid)] = list(chain(*program.courses.all().values_list('key')))
+        return Response(result,status=status.HTTP_200_OK)
