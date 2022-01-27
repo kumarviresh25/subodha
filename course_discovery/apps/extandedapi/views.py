@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from course_discovery.apps.course_metadata.models import Program, Course
-from course_discovery.apps.api.v1.views.search import CourseSearchViewSet
+from course_discovery.apps.api.v1.views.search import CourseSearchViewSet, AggregateSearchViewSet
 from rest_framework import status
 from collections import OrderedDict
 from itertools import chain
@@ -98,6 +98,7 @@ class GetProgramTags(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self,request):
         prog_uuids = request.GET.get('uuids')
+        resume_data = request.GET.get('resume_data')
         tags = list()
         if prog_uuids:
             for prog_id in prog_uuids.split(','):
@@ -113,6 +114,25 @@ class GetProgramTags(APIView):
                     print("Program not found with uuid: %s",prog_id)
                 except Exception as e:
                    print("Error occured due to: %s",e)
+            resume_course_result = dict()
+            if resume_data:
+                temp_course_id = resume_data[0].replace('course-v1:','')
+                course_key = '+'.join(temp_course_id.split('+')[0:len(temp_course_id.split('+'))-1])
+                course = Course.objects.get(key=course_key)
+                programs = Program.objects.filter(course=course)
+                resume_course_programs = filter(lambda x:str(x.uuid) in prog_uuids.split(','),programs)
+                resume_course_result['resume_course'] = {
+                    "course_id":course_key,
+                    "block_id":resume_data[-1],
+                    "programs":[{
+                        "program_uuid":str(prog.uuid),
+                        "prorgam_name":prog.title,
+                        "tags":[tags.name for tags in prog.program_topics.all()]
+                    } for prog in resume_course_programs]
+                }
+            else:
+                resume_course_result['resume_course'] = dict()
+            tags.append(resume_course_result)
         return Response(tags,status=status.HTTP_200_OK)
 
 class GetAllPrograms(APIView):
