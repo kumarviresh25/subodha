@@ -8,6 +8,7 @@ from course_discovery.apps.api.v1.views.search import CourseSearchViewSet, Aggre
 from rest_framework import status
 from collections import OrderedDict
 from itertools import chain
+import logging as log
 
 # pylint: disable=attribute-defined-outside-init
 class GetProgramTopics(APIView):
@@ -99,6 +100,7 @@ class GetProgramTags(APIView):
     def get(self,request):
         prog_uuids = request.GET.get('uuids')
         resume_data = request.GET.get('resume_data')
+        log.info("Resume data received: ".format(resume_data))
         tags = list()
         if prog_uuids:
             for prog_id in prog_uuids.split(','):
@@ -116,11 +118,14 @@ class GetProgramTags(APIView):
                    print("Error occured due to: %s",e)
             resume_course_result = dict()
             if resume_data:
+                log.info("Resume data received")
                 temp_course_id = resume_data[0].replace('course-v1:','')
                 course_key = '+'.join(temp_course_id.split('+')[0:len(temp_course_id.split('+'))-1])
                 course = Course.objects.get(key=course_key)
                 programs = Program.objects.filter(course=course)
+                log.info("Course related programs: {}",programs)
                 resume_course_programs = filter(lambda x:str(x.uuid) in prog_uuids.split(','),programs)
+                log.info("Resume course programs: {}",resume_course_programs)
                 resume_course_result['resume_course'] = {
                     "course_id":course_key,
                     "block_id":resume_data[-1],
@@ -131,6 +136,7 @@ class GetProgramTags(APIView):
                     } for prog in resume_course_programs]
                 }
             else:
+                log.info("Resume data not received: {}",resume_data)
                 resume_course_result['resume_course'] = dict()
             tags.append(resume_course_result)
         return Response(tags,status=status.HTTP_200_OK)
