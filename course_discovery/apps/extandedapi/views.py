@@ -100,7 +100,7 @@ class GetProgramTags(APIView):
     def get(self,request):
         prog_uuids = request.GET.get('uuids')
         resume_data = request.GET.get('resume_data')
-        log.info("Resume data received: ".format(resume_data))
+        log.info("Resume data received: {}".format(resume_data))
         tags = list()
         if prog_uuids:
             for prog_id in prog_uuids.split(','):
