@@ -118,6 +118,7 @@ class GetProgramTags(APIView):
                    print("Error occured due to: %s",e)
             resume_course_result = dict()
             if resume_data:
+                resume_data = resume_data.split(',')
                 log.info("Resume data received")
                 temp_course_id = resume_data[0].replace('course-v1:','')
                 course_key = '+'.join(temp_course_id.split('+')[0:len(temp_course_id.split('+'))-1])
