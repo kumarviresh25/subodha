@@ -134,6 +134,7 @@ class GetProgramTags(APIView):
                     if prog['program_uuid'] in resume_prog_uuid:
                         prog['resume_program'] = {
                             "course_id": course_key,
+                            "course_name": course.title,
                             "block_id": resume_data[-1],
                         }
         return Response(tags,status=status.HTTP_200_OK)
