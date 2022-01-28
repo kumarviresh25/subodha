@@ -116,7 +116,6 @@ class GetProgramTags(APIView):
                     print("Program not found with uuid: %s",prog_id)
                 except Exception as e:
                    print("Error occured due to: %s",e)
-            resume_course_result = dict()
             if resume_data:
                 resume_str = resume_data.replace(' ','+')
                 resume_data = resume_str.split(',')
@@ -125,22 +124,16 @@ class GetProgramTags(APIView):
                 course_key = '+'.join(temp_course_id.split('+')[0:len(temp_course_id.split('+'))-1])
                 course = Course.objects.get(key=course_key)
                 programs = Program.objects.filter(courses=course)
-                log.info("Course related programs: {}",programs)
-                resume_course_programs = filter(lambda x:str(x.uuid) in prog_uuids.split(','),programs)
-                log.info("Resume course programs: {}",resume_course_programs)
-                resume_course_result['resume_course'] = {
-                    "course_id":course_key,
-                    "block_id":resume_data[-1],
-                    "programs":[{
-                        "program_uuid":str(prog.uuid),
-                        "prorgam_name":prog.title,
-                        "tags":[tags.name for tags in prog.program_topics.all()]
-                    } for prog in resume_course_programs]
-                }
-            else:
-                log.info("Resume data not received: {}",resume_data)
-                resume_course_result['resume_course'] = dict()
-            tags.append(resume_course_result)
+                log.info("Course related programs: {}", programs)
+                resume_course_programs = filter(lambda x:str(x.uuid) in prog_uuids.split(','), programs)
+                log.info("Resume course programs: {}", resume_course_programs)
+                resume_prog_uuid = [str(prog.uuid) for prog in resume_course_programs]
+                for prog in tags:
+                    if prog['program_uuid'] in resume_prog_uuid:
+                        prog['resume_program'] = {
+                            "course_id": course_key,
+                            "block_id": resume_data[-1],
+                        }
         return Response(tags,status=status.HTTP_200_OK)
 
 class GetAllPrograms(APIView):
