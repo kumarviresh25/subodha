@@ -101,11 +101,13 @@ class GetProgramTags(APIView):
         prog_uuids = request.GET.get('uuids')
         resume_data = request.GET.get('resume_data')
         log.info("Resume data received: {}".format(resume_data))
+        log.info("Program UUIDS: {}".format(prog_uuids))
         tags = list()
         if prog_uuids:
             for prog_id in prog_uuids.split(','):
                 try:
                     program = Program.objects.get(uuid=prog_id)
+                    log.info("Enrolled Program: {}".format(program.title))
                     response = {
                         "program_uuid":prog_id,
                         "program_title":program.title,
