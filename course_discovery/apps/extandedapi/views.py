@@ -133,7 +133,7 @@ class GetProgramTags(APIView):
                 for prog in tags:
                     if prog['program_uuid'] in resume_prog_uuid:
                         prog['resume_program'] = {
-                            "course_id": course_key,
+                            "course_id": temp_course_id,
                             "course_name": course.title,
                             "block_id": resume_data[-1],
                         }
