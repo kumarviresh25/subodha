@@ -1,9 +1,10 @@
+from unittest import result
 from rest_framework.response import Response
 from django.conf import settings
 from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from course_discovery.apps.course_metadata.models import Program, Course
+from course_discovery.apps.course_metadata.models import Program, Course, CourseRun, SubjectTranslation, Organization
 from course_discovery.apps.api.v1.views.search import CourseSearchViewSet, AggregateSearchViewSet
 from rest_framework import status
 from collections import OrderedDict
@@ -146,4 +147,57 @@ class GetAllPrograms(APIView):
         result = dict()
         for program in programs:
             result[str(program.uuid)] = list(chain(*program.courses.all().values_list('key')))
+        return Response(result,status=status.HTTP_200_OK)
+
+class GetCourseReportsData(APIView):
+    permission_classes = (AllowAny,)
+    def get(self,request):
+        courses = CourseRun.objects.all()
+        result = list()
+        for course in courses:
+            courses_data = dict()
+            tags = list()
+            subjects = list()
+            orgs = list()
+            courses_data['course_id'] = course.key
+            courses_data['course_name'] = course.title_override
+            courses_data['start_date'] = course.start
+            courses_data['end_date'] = course.end
+            programs = Program.objects.filter(courses=course.course)
+            courses_data['programs'] = ','.join([prog.title for prog in programs])
+            for program in programs:
+                program_tag = program.program_topics.all()
+                program_subject = program.program_subjects.all()
+                program_org = program.authoring_organizations.all()
+                tags.extend([tag.name for tag in program_tag])
+                subjects.extend([sub.name for sub in program_subject])
+                orgs.extend([org.key for org in program_org])
+            courses_data['tags'] = ','.join(tags)
+            courses_data['subjects'] = ','.join(subjects)
+            courses_data['organizations'] = ','.join(orgs)
+            result.append(courses_data)
+        return Response(result,status=status.HTTP_200_OK)
+
+class GetReportsFilterData(APIView):
+    permission_classes = (AllowAny,)
+    def get(self,request):
+        result = dict()
+
+        programs_obj = Program.objects.all()
+        programs = {prog.title:prog.title.upper() for prog in programs_obj}
+
+        orgs_obj = Organization.objects.filter(name__isnull=False)
+        orgs = {x.name:x.name.upper() for x in orgs_obj}
+
+        subjects_obj = SubjectTranslation.objects.filter(language_code='en')
+        subjects = {sub.name:sub.name.upper() for sub in subjects_obj}
+
+        courses = CourseRun.objects.all()
+        courses = {course.title_override:course.title_override.upper() for course in courses}
+
+        result['programs']=programs
+        result['orgs']=orgs
+        result['subjects']=subjects
+        result['courses']=courses
+
         return Response(result,status=status.HTTP_200_OK)
