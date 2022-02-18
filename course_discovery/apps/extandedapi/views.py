@@ -96,6 +96,7 @@ class CustomSearch(APIView):
         final_response["results"] = content.data['results']
         return Response(final_response,status=status.HTTP_200_OK)      
 
+# Extract all programs and detials based on prorgrma uuid and extract the resume program data based on course block id
 class GetProgramTags(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self,request):
