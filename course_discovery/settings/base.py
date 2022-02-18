@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'course_update_scripts',
     'extandedapi',
+    # 'mx_multilingual_discovery',
 ]
 
 THIRD_PARTY_APPS = [
@@ -83,6 +84,7 @@ PROJECT_APPS = [
     'course_discovery.apps.publisher',
     'course_discovery.apps.publisher_comments',
     'course_discovery.apps.journal',
+    'course_discovery.apps.mx_multilingual_discovery',
 ]
 
 
@@ -151,6 +153,11 @@ PARLER_DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE
 PARLER_LANGUAGES = {
     1: (
         {'code': LANGUAGE_CODE, },
+        {'code': 'kn', },
+        {'code': 'hi', },
+        {'code': 'ml', },
+        {'code': 'te', },
+        {'code': 'ta', },
     ),
     'default': {
          'fallbacks': [PARLER_DEFAULT_LANGUAGE_CODE],

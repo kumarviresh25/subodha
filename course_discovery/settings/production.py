@@ -92,3 +92,27 @@ COMPRESS_OFFLINE = True
 
 # Have images and such that we upload be publicly readable
 AWS_DEFAULT_ACL = 'public-read'
+
+
+LANGUAGE_CODE = 'en'
+
+PARLER_DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE
+
+PARLER_LANGUAGES = {
+    1: (
+        {'code': LANGUAGE_CODE, },
+        {'code': 'kn', },
+        {'code': 'hi', },
+        {'code': 'ml', },
+        {'code': 'te', },
+        {'code': 'ta', },
+    ),
+    'default': {
+         'fallbacks': [PARLER_DEFAULT_LANGUAGE_CODE],
+         'hide_untranslated': False,
+     }
+ }
+
+# Parler seems to be a bit overeager with its caching of translated models,
+# and so we get a large number of sets, but rarely any gets
+PARLER_ENABLE_CACHING = False

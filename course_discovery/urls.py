@@ -49,7 +49,7 @@ urlpatterns = oauth2_urlpatterns + [
     url(r'^taggit_autosuggest/', include('taggit_autosuggest.urls')),
     url(r'^course_update_scripts/', include('course_update_scripts.urls')),
     url(r'^extandedapi/', include('extandedapi.urls')),
-
+    url(r'^mx_discovery/', include('mx_multilingual_discovery.urls')),
 ]
 
 # edx-drf-extensions csrf app
