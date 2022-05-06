@@ -6,10 +6,12 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from course_discovery.apps.course_metadata.models import Program, Course, CourseRun, SubjectTranslation, Organization
 from course_discovery.apps.api.v1.views.search import CourseSearchViewSet, AggregateSearchViewSet
+from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
 from rest_framework import status
 from collections import OrderedDict
 from itertools import chain
 import logging as log
+from django.db.models import Q
 
 # pylint: disable=attribute-defined-outside-init
 class GetProgramTopics(APIView):
@@ -37,13 +39,46 @@ class GetProgramTopics(APIView):
                 }
             }
         alias = settings.HAYSTACK_CONNECTIONS['default']['INDEX_NAME']
+        
         # index = '{alias}_20160621_000000'.format(alias=alias)
 
         host = settings.HAYSTACK_CONNECTIONS['default']['URL']
+        
         connection = Elasticsearch(host)
         index_value = connection.indices.get_alias(name=alias)
         es_response = connection.search(index=[i for i in index_value.keys()][0], body=body)
-        #es_response['facets']['tags']['terms']   status=status.HTTP_200_OK
+
+        
+
+        try:
+            accept_language = request.headers['Accept-Language']
+            if not accept_language or accept_language=='en':
+                return Response(es_response['facets']['tags'])
+        except KeyError:
+            return Response(es_response['facets']['tags'])
+
+        
+
+        
+        tag = MultiLingualDiscovery.objects.language('en').filter(Q(content_type='Tag')).active_translations(title__in=[i['term'] for i in es_response['facets']['tags']['terms']])
+
+        converted_tag = MultiLingualDiscovery.objects.language(accept_language).filter(Q(content_type='Tag')).active_translations(title__in=[i.title for i in tag])
+
+        # data = tag.__dict__
+        # import pdb;pdb.set_trace()
+        data = {}
+        for j in range(len(converted_tag)):
+            data[tag[j].title] = converted_tag[j].title
+    
+            
+        for i in range(len(es_response['facets']['tags']['terms'])):
+
+            if es_response['facets']['tags']['terms'][i]['term'] in data:
+                 es_response['facets']['tags']['terms'][i]['converted_term'] = data[es_response['facets']['tags']['terms'][i]['term']]
+            else:
+                es_response['facets']['tags']['terms'][i]['converted_term'] = ''
+
+
         return Response(es_response['facets']['tags'])
 
 class CustomSearch(APIView):
