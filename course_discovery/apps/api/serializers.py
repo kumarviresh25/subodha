@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=abstract-method
 import datetime
 import json
@@ -761,6 +762,7 @@ class MinimalCourseRunSerializer(DynamicFieldsMixin, TimestampModelSerializer):
 
     @classmethod
     def prefetch_queryset(cls, queryset=None):
+        
         # Explicitly check for None to avoid returning all CourseRuns when the
         # queryset passed in happens to be empty.
         queryset = queryset if queryset is not None else CourseRun.objects.all()
@@ -773,11 +775,12 @@ class MinimalCourseRunSerializer(DynamicFieldsMixin, TimestampModelSerializer):
 
     class Meta:
         model = CourseRun
-        fields = ('key', 'uuid', 'title', 'external_key', 'image', 'short_description', 'marketing_url',
+        fields = ('key', 'uuid', 'title', 'converted_course_title', 'external_key', 'image', 'short_description', 'marketing_url',
                   'seats', 'start', 'end', 'go_live_date', 'enrollment_start', 'enrollment_end',
                   'pacing_type', 'type', 'run_type', 'status', 'is_enrollable', 'is_marketable', 'term',)
 
     def get_marketing_url(self, obj):
+        
         include_archived = self.context.get('include_archived')
         now = datetime.datetime.now(pytz.UTC)
         if include_archived and obj.end and obj.end <= now:
@@ -795,6 +798,7 @@ class MinimalCourseRunSerializer(DynamicFieldsMixin, TimestampModelSerializer):
         return marketing_url
 
     def ensure_term(self, data):
+        
         course = data['course']  # required
         org, number = parse_course_key_fragment(course.key_for_reruns or course.key)
 
@@ -817,6 +821,7 @@ class MinimalCourseRunSerializer(DynamicFieldsMixin, TimestampModelSerializer):
         data['key'] = str(key)
 
     def validate(self, attrs):
+        
         start = attrs.get('start', self.instance.start if self.instance else None)
         end = attrs.get('end', self.instance.end if self.instance else None)
 
@@ -1225,7 +1230,7 @@ class MinimalProgramCourseSerializer(MinimalCourseSerializer):
         This is shared by both MinimalProgramSerializer and ProgramSerializer!
     """
     course_runs = serializers.SerializerMethodField()
-
+    
     def get_course_runs(self, course):
         course_runs = self.context['course_runs']
         course_runs = [course_run for course_run in course_runs if course_run.course == course]
@@ -1236,7 +1241,8 @@ class MinimalProgramCourseSerializer(MinimalCourseSerializer):
         serializer_class = MinimalCourseRunSerializer
         if self.context.get('use_full_course_serializer', False):
             serializer_class = CourseRunSerializer
-
+        
+        
         return serializer_class(
             course_runs,
             many=True,
@@ -1245,6 +1251,7 @@ class MinimalProgramCourseSerializer(MinimalCourseSerializer):
                 'exclude_utm': self.context.get('exclude_utm'),
             }
         ).data
+        
 
 
 class RankingSerializer(BaseModelSerializer):
@@ -1418,11 +1425,13 @@ class MinimalProgramSerializer(DynamicFieldsMixin, BaseModelSerializer):
     degree = DegreeSerializer()
     curricula = CurriculumSerializer(many=True)
 
+    
     @classmethod
     def prefetch_queryset(cls, partner, queryset=None):
         # Explicitly check if the queryset is None before selecting related
         queryset = queryset if queryset is not None else Program.objects.filter(partner=partner)
 
+        
         return queryset.select_related('type', 'partner').prefetch_related(
             'excluded_course_runs',
             # `type` is serialized by a third-party serializer. Providing this field name allows us to
@@ -1439,13 +1448,14 @@ class MinimalProgramSerializer(DynamicFieldsMixin, BaseModelSerializer):
     class Meta:
         model = Program
         fields = (
-            'uuid', 'title', 'subtitle', 'type', 'type_attrs', 'status', 'marketing_slug', 'marketing_url',
+            'uuid', 'title','converted_title', 'subtitle', 'type', 'type_attrs', 'status', 'marketing_slug', 'marketing_url',
             'banner_image', 'hidden', 'courses', 'authoring_organizations', 'card_image_url',
             'is_program_eligible_for_one_click_purchase', 'degree', 'curricula', 'marketing_hook',
         )
         read_only_fields = ('uuid', 'marketing_url', 'banner_image')
 
     def get_courses(self, program):
+        
         course_runs = list(program.course_runs)
 
         if self.context.get('marketable_enrollable_course_runs_with_archived'):
@@ -1459,6 +1469,7 @@ class MinimalProgramSerializer(DynamicFieldsMixin, BaseModelSerializer):
         else:
             courses = program.courses.all()
 
+        
         course_serializer = MinimalProgramCourseSerializer(
             courses,
             many=True,
@@ -1469,9 +1480,11 @@ class MinimalProgramSerializer(DynamicFieldsMixin, BaseModelSerializer):
                 'program': program,
                 'course_runs': course_runs,
                 'use_full_course_serializer': self.context.get('use_full_course_serializer', False),
+                
+                
             }
         )
-
+       
         return course_serializer.data
 
     def sort_courses(self, program, course_runs):
@@ -2177,6 +2190,7 @@ class ProgramSearchSerializer(HaystackSerializer):
     authoring_organizations = serializers.SerializerMethodField()
 
     def get_authoring_organizations(self, program):
+        
         organizations = program.authoring_organization_bodies
         return [json.loads(organization) for organization in organizations] if organizations else []
 
@@ -2207,6 +2221,7 @@ class ProgramFacetSerializer(BaseHaystackFacetSerializer):
         field_aliases = COMMON_SEARCH_FIELD_ALIASES
         ignore_fields = COMMON_IGNORED_FIELDS
         index_classes = [search_indexes.ProgramIndex]
+        
         field_options = {
             'status': {},
             'type': {},
@@ -2215,6 +2230,8 @@ class ProgramFacetSerializer(BaseHaystackFacetSerializer):
         fields = search_indexes.BASE_PROGRAM_FIELDS + (
             'organizations',
         )
+
+       
 
 
 class AggregateSearchSerializer(HaystackSerializer):
@@ -2282,6 +2299,9 @@ class CourseRunSearchModelSerializer(HaystackSerializerMixin, ContentTypeSeriali
 class ProgramSearchModelSerializer(HaystackSerializerMixin, ContentTypeSerializer, ProgramSerializer):
     class Meta(ProgramSerializer.Meta):
         fields = ContentTypeSerializer.Meta.fields + ProgramSerializer.Meta.fields
+        
+        
+        
 
 
 class AggregateSearchModelSerializer(HaystackSerializer):

@@ -4,7 +4,7 @@ from django.conf import settings
 from elasticsearch import Elasticsearch
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from course_discovery.apps.course_metadata.models import Program, Course, CourseRun, SubjectTranslation, Organization
+from course_discovery.apps.course_metadata.models import Program, Course, CourseRun, SubjectTranslation, Organization, Subject
 from course_discovery.apps.api.v1.views.search import CourseSearchViewSet, AggregateSearchViewSet
 from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
 from rest_framework import status
@@ -19,7 +19,13 @@ class GetProgramTopics(APIView):
     permission_classes = (IsAuthenticated,)
     
     def get(self, request):
-        sub_name = request.GET.get('subject_name')
+        subject_name_param = request.GET.get('subject_name')
+        sub = SubjectTranslation.objects.filter(name=subject_name_param)
+        sub_id = sub[0].master.id
+        sub_en = Subject.objects.language('en').get(id=sub_id)
+        sub_name = sub_en.name
+        
+        
         body = {
             "query": {"bool": {
                 "must": [
@@ -112,7 +118,7 @@ class CustomSearch(APIView):
                     "program_name":program.title,
                     "program_id":program.uuid,
                     "tags":[tags.name for tags in program.program_topics.all()] })for program in programs]
-                
+              
             return programs_dict
         except Course.DoesNotExist:
             programs_dict = None

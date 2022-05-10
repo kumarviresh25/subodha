@@ -47,6 +47,7 @@ from course_discovery.apps.course_metadata.utils import (
 from course_discovery.apps.ietf_language_tags.models import LanguageTag
 from course_discovery.apps.publisher.utils import VALID_CHARS_IN_COURSE_NUM_AND_ORG_KEY
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -837,6 +838,8 @@ class Course(DraftModelMixin, PkSearchableMixin, CachedMixin, TimeStampedModel):
         if self.image:
             return self.image.url
         return None
+    
+   
 
     @property
     def marketing_url(self):
@@ -1333,6 +1336,16 @@ class CourseRun(DraftModelMixin, CachedMixin, TimeStampedModel):
 
         price = int(seats[0].price) if seats[0].price else None
         return price
+    
+    @property
+    def converted_course_title(self):
+        from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
+        course_name = MultiLingualDiscovery.objects.filter(content_type='Course').active_translations(title=self.title)
+        
+
+        return course_name[0].title
+        
+    
 
     def first_enrollable_paid_seat_sku(self):
         # Sort in python to avoid an additional request to the database for order_by
@@ -2143,6 +2156,19 @@ class Program(PkSearchableMixin, TimeStampedModel):
             return urljoin(self.partner.marketing_site_url_root, path)
 
         return None
+    
+    @property
+    def converted_title(self):
+        from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
+        program_name = MultiLingualDiscovery.objects.filter(content_type='Program').active_translations(title=self.title)
+        
+
+        return program_name[0].title
+
+
+       
+
+        
 
     @property
     def course_runs(self):
