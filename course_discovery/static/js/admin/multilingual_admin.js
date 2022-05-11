@@ -1,13 +1,13 @@
 $( document ).ready(function() {
-    $('.field-program_key').hide()
-    $('.field-course_key').hide()
+   $('.field-program_title').hide()
+    $('.field-course_title').hide()
     let content_type = $('#id_content_type').val()
     $('#id_content_type').change(function(e){
         var content_type = this.value;
         _handleFields(content_type);
     })
 
-    $('#id_program_key').change(function(e){
+    $('#id_program_title').change(function(e){
         let program_key = this.value;
         var url = window.location.origin+'/mx_discovery/getkeydata?key='+program_key+'&type=program';
         $.ajax({
@@ -19,7 +19,7 @@ $( document ).ready(function() {
         });
     })
 
-    $('#id_course_key').change(function(e){
+    $('#id_course_title').change(function(e){
         let course_key = this.value;
         var url = window.location.origin+'/mx_discovery/getkeydata?key='+course_key+'&type=course';
         $.ajax({
@@ -48,19 +48,19 @@ $( document ).ready(function() {
                 let program_short_desc = $('#id_short_description').val();
                 let program_full_desc = $('#id_full_description').val();
                 _populateValues(program_title,program_short_desc,program_full_desc);
-                if ($('.field-course_key').show()){
-                    $('.field-course_key').hide();
+                if ($('.field-course_title').show()){
+                    $('.field-course_title').hide();
                 }
-                $('.field-program_key').show();
+                $('.field-program_title').show();
                 $('.field-short_description').show();
                 $('.field-full_description').show();
-                if ($('.field-course_key label').hasClass('required')){
-                    $('.field-course_key label').removeClass('required');
-                    $('#id_course_key').prop('required',false);
+                if ($('.field-course_title label').hasClass('required')){
+                    $('.field-course_title label').removeClass('required');
+                    $('#id_course_title').prop('required',false);
                 }
-                if (! $('.field-program_key label').hasClass('required')){
-                    $('.field-program_key label').addClass('required');
-                    $('#id_program_key').prop('required',true);
+                if (! $('.field-program_title label').hasClass('required')){
+                    $('.field-program_title label').addClass('required');
+                    $('#id_program_title').prop('required',true);
                 }
                 
                 break;
@@ -69,19 +69,19 @@ $( document ).ready(function() {
                 let course_short_desc = $('#id_short_description').val();
                 let course_full_desc = $('#id_full_description').val();
                 _populateValues(course_title,course_short_desc,course_full_desc);
-                if ($('.field-program_key').show()){
-                    $('.field-program_key').hide();
+                if ($('.field-program_title').show()){
+                    $('.field-program_title').hide();
                 }
-                $('.field-course_key').show();
+                $('.field-course_title').show();
                 $('.field-short_description').show();
                 $('.field-full_description').show();
-                if ($('.field-program_key label').hasClass('required')){
-                    $('.field-program_key label').removeClass('required');
-                    $('#id_program_key').prop('required',false);
+                if ($('.field-program_title label').hasClass('required')){
+                    $('.field-program_title label').removeClass('required');
+                    $('#id_program_title').prop('required',false);
                 }
-                if (! $('.field-course_key label').hasClass('required')){
-                    $('.field-course_key label').addClass('required');
-                    $('#id_course_key').prop('required',true);
+                if (! $('.field-course_title label').hasClass('required')){
+                    $('.field-course_title label').addClass('required');
+                    $('#id_course_title').prop('required',true);
                 }
                 break;
             case 'tag':
@@ -89,19 +89,19 @@ $( document ).ready(function() {
                 let tag_short_desc = $('#id_short_description').val();
                 let tag_full_desc = $('#id_full_description').val();
                 _populateValues(tag_title,tag_short_desc,tag_full_desc);
-                $('.field-program_key').hide();
-                $('.field-course_key').hide();
+                $('.field-program_title').hide();
+                $('.field-course_title').hide();
                 $('#id_short_description').val('');
                 $('.field-short_description').hide();
                 $('#id_full_description').val('');
                 $('.field-full_description').hide();
-                if ($('.field-course_key label').hasClass('required')){
-                    $('.field-course_key label').removeClass('required');
-                    $('#id_course_key').prop('required',false);
+                if ($('.field-course_title label').hasClass('required')){
+                    $('.field-course_title label').removeClass('required');
+                    $('#id_course_title').prop('required',false);
                 }
-                if ($('.field-program_key label').hasClass('required')){
-                    $('.field-program_key label').removeClass('required');
-                    $('#id_program_key').prop('required',false);
+                if ($('.field-program_title label').hasClass('required')){
+                    $('.field-program_title label').removeClass('required');
+                    $('#id_program_title').prop('required',false);
                 }
                 break;
         }
