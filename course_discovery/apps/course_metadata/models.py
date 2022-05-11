@@ -1345,7 +1345,7 @@ class CourseRun(DraftModelMixin, CachedMixin, TimeStampedModel):
             
 
             return course_name[0].title
-        except:
+        except Exception as e:
             return ""
         
     
@@ -2168,7 +2168,7 @@ class Program(PkSearchableMixin, TimeStampedModel):
             
 
             return program_name[0].title
-        except:
+        except Exception as e:
             return ""
 
 
