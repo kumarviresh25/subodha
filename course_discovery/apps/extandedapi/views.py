@@ -21,9 +21,14 @@ class GetProgramTopics(APIView):
     def get(self, request):
         subject_name_param = request.GET.get('subject_name')
         sub = SubjectTranslation.objects.filter(name=subject_name_param)
-        sub_id = sub[0].master.id
-        sub_en = Subject.objects.language('en').get(id=sub_id)
-        sub_name = sub_en.name
+
+        try:
+            sub_id = sub[0].master.id
+            sub_en = Subject.objects.language('en').get(id=sub_id)
+            sub_name = sub_en.name
+            
+        except Exception as e:
+            sub_name = subject_name_param
         
         
         body = {
