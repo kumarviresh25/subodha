@@ -1339,11 +1339,14 @@ class CourseRun(DraftModelMixin, CachedMixin, TimeStampedModel):
     
     @property
     def converted_course_title(self):
-        from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
-        course_name = MultiLingualDiscovery.objects.filter(content_type='Course').active_translations(title=self.title)
-        
+        try:
+            from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
+            course_name = MultiLingualDiscovery.objects.filter(content_type='Course').active_translations(title=self.title)
+            
 
-        return course_name[0].title
+            return course_name[0].title
+        except:
+            return ""
         
     
 
@@ -2159,11 +2162,14 @@ class Program(PkSearchableMixin, TimeStampedModel):
     
     @property
     def converted_title(self):
-        from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
-        program_name = MultiLingualDiscovery.objects.filter(content_type='Program').active_translations(title=self.title)
-        
+        try:
+            from course_discovery.apps.mx_multilingual_discovery.models import MultiLingualDiscovery
+            program_name = MultiLingualDiscovery.objects.filter(content_type='Program').active_translations(title=self.title)
+            
 
-        return program_name[0].title
+            return program_name[0].title
+        except:
+            return ""
 
 
        
