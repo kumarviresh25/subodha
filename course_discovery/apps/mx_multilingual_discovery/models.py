@@ -12,8 +12,8 @@ CONTENT_TYPE = (
 
 class MultiLingualDiscovery(TranslatableModel):
     content_type = models.CharField(choices=CONTENT_TYPE,max_length=20,verbose_name="Content Type")
-    program_key = models.ForeignKey(to=Program,on_delete=models.CASCADE,null=True,blank=True,related_name="multilingual_program",verbose_name="Program Key")
-    course_key = models.ForeignKey(to=CourseRun,on_delete=models.CASCADE,null=True,blank=True,related_name="multilingual_course",verbose_name="Course Key")
+    program_title = models.ForeignKey(to=Program,on_delete=models.CASCADE,null=True,blank=True,related_name="multilingual_program",verbose_name="Program Title")
+    course_title = models.ForeignKey(to=CourseRun,on_delete=models.CASCADE,null=True,blank=True,related_name="multilingual_course",verbose_name="Course Title")
 
     title = TranslatedField()
     short_description = TranslatedField()
@@ -24,9 +24,9 @@ class MultiLingualDiscovery(TranslatableModel):
         verbose_name = _("MultiLingualDiscovery")
 
     def clean(self):
-        if self.content_type == 'program' and self.program_key is None:
+        if self.content_type == 'program' and self.program_title is None:
             raise ValidationError('Program key is required for the program type of content.')
-        elif self.content_type == 'course' and self.course_key is None:
+        elif self.content_type == 'course' and self.course_title is None:
             raise ValidationError('Course key is required for the program type of content.')
 
     def __str__(self):
