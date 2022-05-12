@@ -14,7 +14,7 @@ $( document ).ready(function() {
             type: 'GET',
             url: url,
             success:function(data){
-                _populateValues(data.title,data.short_description,data.full_description)
+                _populateValues(data.program_title,data.short_description,data.full_description)
             }
         });
     })
@@ -26,7 +26,7 @@ $( document ).ready(function() {
             type: 'GET',
             url: url,
             success:function(data){
-                _populateValues(data.title,data.short_description,data.full_description)
+                _populateValues(data.course_title,data.short_description,data.full_description)
             }
         });
     })
