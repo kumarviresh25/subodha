@@ -10,7 +10,7 @@ class CourseChoiceField(forms.ModelChoiceField):
     # field to get the course key for the API hit.
      def label_from_instance(self, obj):
          
-         return "{}+{}".format(obj.title, obj.id)
+         return "{} ({})".format(obj.title, obj.canonical_course_run)
 
 class MultilingualDiscoveryAdmin(TranslatableAdmin):
 
