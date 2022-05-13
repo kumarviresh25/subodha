@@ -29,7 +29,7 @@ class GetKeyData(APIView):
         key_type = request.GET.get('type')
         if key_type == 'course':
             try:
-                course = Course.objects.get(id=key)
+                course = Course.objects.get(pk=key)
                 response = {
                     "title":course.title,
                     "short_description":course.short_description,
