@@ -10,7 +10,7 @@ class CourseChoiceField(forms.ModelChoiceField):
     # field to get the course key for the API hit.
      def label_from_instance(self, obj):
          
-         return "{}+{}".format(obj.course.title, obj.course.id)
+         return "{}+{}".format(obj.title, obj.id)
 
 class MultilingualDiscoveryAdmin(TranslatableAdmin):
 
@@ -27,7 +27,7 @@ class MultilingualDiscoveryAdmin(TranslatableAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         kwargs['required'] = False
         if db_field.name == 'course_title':
-            return CourseChoiceField(queryset=CourseRun.objects.all(), required=False)
+            return CourseChoiceField(queryset=Course.objects.all(), required=False)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 admin.site.register(MultiLingualDiscovery, MultilingualDiscoveryAdmin)
